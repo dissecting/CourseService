@@ -1,0 +1,17 @@
+.THIS .slds-box {
+    margin-top: token(divMarginTop);
+    font-weight: token(fontWeightBold);
+    min-height: token(divFormElementHeight);
+    max-height: token(divFormElementHeight);
+    max-width: token(divFormElementWidth);
+}
+
+.THIS .slds-text-title {
+    font-weight: token(fontWeightBold);
+    font-size: token(fontSizeLarge);
+}
+
+.THIS .slds-card {
+    width: token(divFormElementWidth);
+    max-width: token(divFormElementWidth);
+}

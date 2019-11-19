@@ -1,0 +1,57 @@
+<aura:component controller="CourseServiceController" implements="forceCommunity:layout,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name="courseDateList" type="Date[]"/>
+    <aura:attribute name="courseNameList" type="List"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-align_absolute-center">
+            <article class="slds-card">
+                <div class="slds-m-around--large">
+                    <span class="slds-text-title slds-align_absolute-center">
+                        Course Service
+                    </span>
+                    <div class="slds-box">
+                        <lightning:input name="inputFirstName"
+                                    value=""
+                                    required="true"
+                                    label="{!$Label.c.firstNameLabel}"/>
+                    </div>
+                    <div class="slds-box">
+                        <lightning:input name="inputLastName"
+                                    value=""
+                                    required="true"
+                                    label="{!$Label.c.lastNameLabel}"/>
+                    </div>
+                    <div class="slds-box">
+                        <lightning:input name="inputEmail"
+                                    value=""
+                                    required="true"
+                                    label="{!$Label.c.emailAddressLabel}"/>
+                    </div>
+                    <div class="slds-box">
+                        <lightning:combobox name="inputCourse"
+                                    label="Course"
+                                    value=""
+                                    options="{!v.courseNameList}"
+                                    required="true"
+                                    onchange=""/>
+                    </div>
+                    <div class="slds-box">
+                        <lightning:input name="inputDate"
+                                    type="date"
+                                    value=""
+                                    required="true"
+                                    label="Date"/>
+                    </div>
+                    <div class="slds-align_absolute-center">
+                        <lightning:button class="slds-button slds-button_brand slds-m-around_x-small"
+                                        name="submit"
+                                        label="Submit"
+                                        iconName="utility:new"
+                                        iconPosition="left"
+                                        onclick=""/>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</aura:component>
