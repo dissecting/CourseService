@@ -3,7 +3,7 @@ public with sharing class ContactEventTriggerHandler {
     public static void changeCourseStatus(List<ContactEvent__c> contactEventList) {
 
         List<ContactEvent__c> contactEventAttendedList = [
-            SELECT Name, Status__c, EventId__c, EventIdUrl__c, Contact__c, CreatedDate
+            SELECT Name, Status__c, EventId__c, Contact__c, CreatedDate
             FROM ContactEvent__c
             WHERE Status__c = 'Attended'
             ORDER BY CreatedDate

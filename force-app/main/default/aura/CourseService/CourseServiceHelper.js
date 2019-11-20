@@ -31,5 +31,33 @@
             "message": msg
         });
         toastEvent.fire();
+    },
+
+    handleChange: function (component, selectedOptionValue) {
+        component.set("v.courseName", selectedOptionValue);
+    },
+
+    handleSubmit: function (component, firstName, lastName, email, courseName, courseDate) {
+        var action = component.get("c.registerCourseContact");
+        action.setParams({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            courseName: courseName,
+            courseDate: courseDate
+        });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+
+            if (state === "SUCCESS") {
+                var msgSuccess = response.getReturnValue();
+                this.handleShowToast(component, state, msgSuccess);
+            } else if (state === "ERROR") {
+                var errors = response.getError();
+                this.handleShowToast(component, state, errors[0].message);
+                console.error(errors);
+            }
+        });
+        $A.enqueueAction(action);
     }
 })
