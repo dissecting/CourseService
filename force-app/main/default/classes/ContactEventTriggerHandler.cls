@@ -6,6 +6,13 @@ public with sharing class ContactEventTriggerHandler {
             SELECT Name, Status__c, EventId__c, Contact__c, CreatedDate
             FROM ContactEvent__c
             WHERE Status__c = 'Attended'
+            ORDER BY CreatedDate DESC
+        ];
+
+        List<ContactEvent__c> contactEventWaitingList = [
+            SELECT Name, Status__c, EventId__c, Contact__c, CreatedDate
+            FROM ContactEvent__c
+            WHERE Status__c = 'Waiting List'
             ORDER BY CreatedDate
         ];
 
@@ -43,7 +50,9 @@ public with sharing class ContactEventTriggerHandler {
                 if (evt.Max_Person__c < eventMap.get(evt.Id).size()) {
                     waitingContactEventList.add(eventMap.get(evt.Id)[0]);
                 } else if (evt.Max_Person__c > eventMap.get(evt.Id).size()) {
-                    attendedContactEventList.add(eventMap.get(evt.Id)[0]);
+                    if (!contactEventWaitingList.isEmpty()) {
+                        attendedContactEventList.add(contactEventWaitingList[0]);
+                    }
                 }
             }
 

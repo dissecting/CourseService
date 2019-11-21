@@ -51,7 +51,7 @@ public without sharing class CourseServiceController {
             List<Contact> contactList = [
                 SELECT Email
                 FROM Contact
-                WHERE Email = : email
+                WHERE Email = :email
                 LIMIT 1
             ];
 
@@ -83,7 +83,7 @@ public without sharing class CourseServiceController {
                     List<Contact> newContactList = [
                         SELECT Email
                         FROM Contact
-                        WHERE Email = : email
+                        WHERE Email = :email
                         LIMIT 1
                     ];
                     ContactEvent__c newContactEvent = new ContactEvent__c(
