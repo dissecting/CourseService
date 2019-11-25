@@ -1,4 +1,4 @@
-public with sharing class ContactEventTriggerHandler {
+public without sharing class ContactEventTriggerHandler {
 
     public static void changeCourseStatus(List<ContactEvent__c> contactEventList) {
 
@@ -49,10 +49,8 @@ public with sharing class ContactEventTriggerHandler {
 
                 if (evt.Max_Person__c < eventMap.get(evt.Id).size()) {
                     waitingContactEventList.add(eventMap.get(evt.Id)[0]);
-                } else if (evt.Max_Person__c > eventMap.get(evt.Id).size()) {
-                    if (!contactEventWaitingList.isEmpty()) {
-                        attendedContactEventList.add(contactEventWaitingList[0]);
-                    }
+                } else if (!contactEventWaitingList.isEmpty() && evt.Max_Person__c > eventMap.get(evt.Id).size()) {
+                    attendedContactEventList.add(contactEventWaitingList[0]);
                 }
             }
 

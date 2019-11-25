@@ -14,13 +14,17 @@ public without sharing class CourseServiceController {
             SELECT Course__r.Name, ActivityDate
             FROM Event
             WHERE Course__r.Name != NULL
+            ORDER BY ActivityDate
         ];
 
-        List<Date> courseDateList = new List<Date>();
-        List<String> courseNameList = new List<String>();
-
         for (Event evt : eventList) {
-            coursesWithDates.courseDateList.add(evt.ActivityDate);
+            if (coursesWithDates.courseDateMap.containsKey(evt.Course__r.Name)) {
+                List<Date> evtDateList = coursesWithDates.courseDateMap.get(evt.Course__r.Name);
+                evtDateList.add(evt.ActivityDate);
+                coursesWithDates.courseDateMap.put(evt.Course__r.Name, evtDateList);
+            } else {
+                coursesWithDates.courseDateMap.put(evt.Course__r.Name, new List<Date> { evt.ActivityDate });
+            }
         }
 
         for (Course__c course : courseList) {
@@ -31,7 +35,7 @@ public without sharing class CourseServiceController {
     }
 
     @AuraEnabled
-    public static String registerCourseContact(String firstName,
+    public static void registerCourseContact(String firstName,
                                             String lastName,
                                             String email,
                                             String courseName,
@@ -47,6 +51,12 @@ public without sharing class CourseServiceController {
         if (isBlankField) {
             throw new AuraHandledException(Label.errMsgFieldsMustBeFilled);
         } else {
+
+            Boolean isCorrectEmail = (Pattern.matches(Label.emailPattern, email));
+
+            if (!isCorrectEmail) {
+                throw new AuraHandledException(Label.errMsgIncorrectEmail);
+            }
 
             List<Contact> contactList = [
                 SELECT Email
@@ -68,56 +78,57 @@ public without sharing class CourseServiceController {
                 Email = email
             );
 
-            try {
-                if (contactList.isEmpty()) {
-                    insert newContact;
-                } else {
-                    contactList[0].FirstName = firstName;
-                    contactList[0].LastName = lastName;
-                    contactList[0].Email = email;
+            if (contactList.isEmpty()) {
+                insert newContact;
+            } else {
+                contactList[0].FirstName = firstName;
+                contactList[0].LastName = lastName;
+                contactList[0].Email = email;
 
-                    update contactList;
-                }
+                update contactList;
+            }
 
-                if (!eventList.isEmpty()) {
-                    List<Contact> newContactList = [
-                        SELECT Email
-                        FROM Contact
-                        WHERE Email = :email
-                        LIMIT 1
-                    ];
+            if (!eventList.isEmpty()) {
+                List<Contact> newContactList = [
+                    SELECT Email
+                    FROM Contact
+                    WHERE Email = :email
+                    LIMIT 1
+                ];
+
+                List<ContactEvent__c> contactEventList = [
+                    SELECT Contact__c
+                    FROM ContactEvent__c
+                    WHERE Contact__c = :newContactList[0].Id
+                ];
+
+                if (contactEventList.isEmpty()) {
                     ContactEvent__c newContactEvent = new ContactEvent__c(
                         Contact__c = newContactList[0].Id,
-                        Name = lastName.right(30) + '-' + courseName.right(30),
+                        Name = email.right(30) + '-' + courseName.right(30),
                         EventId__c = eventList[0].Id,
                         Status__c = 'Waiting List'
                     );
 
                     insert newContactEvent;
-
-                    msg = 'You successfully registered';
                 } else {
-                    throw new AuraHandledException(msg);
+                    throw new AuraHandledException('This contact already been registered');
                 }
-
-            } catch (Exception e) {
-                throw new AuraHandledException(e.getMessage());
+            } else {
+                throw new AuraHandledException(msg);
             }
-
         }
-
-        return msg;
     }
 
     public class CoursesWithDates {
 
         @AuraEnabled
-        public List<Date> courseDateList { get; set; }
+        public Map<String, List<Date>> courseDateMap { get; set; }
         @AuraEnabled
         public List<String> courseNameList { get; set; }
 
         public CoursesWithDates() {
-            this.courseDateList = new List<Date>();
+            this.courseDateMap = new Map<String, List<Date>>();
             this.courseNameList = new List<String>();
         }
     }

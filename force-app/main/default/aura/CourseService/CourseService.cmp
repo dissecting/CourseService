@@ -1,6 +1,9 @@
 <aura:component controller="CourseServiceController" implements="forceCommunity:layout,forceCommunity:availableForAllPageTypes" access="global">
-    <aura:attribute name="courseDateList" type="Date[]"/>
+    <aura:attribute name="courseDateMap" type="Map"/>
     <aura:attribute name="courseNameList" type="List"/>
+    <aura:attribute name="firstDate" type="Date"/>
+    <aura:attribute name="lastDate" type="Date"/>
+    <aura:attribute name="isUnassigned" type="Boolean" default="true"/>
     <aura:attribute name="firstName" type="String" access="private"/>
     <aura:attribute name="lastName" type="String" access="private"/>
     <aura:attribute name="email" type="String" access="private"/>
@@ -45,6 +48,9 @@
                                     type="date"
                                     value="{!v.courseDate}"
                                     required="true"
+                                    disabled="{!v.isUnassigned}"
+                                    min="{!v.firstDate}"
+                                    max="{!v.lastDate}"
                                     label="Date"/>
                     </div>
                     <div class="slds-align_absolute-center">
