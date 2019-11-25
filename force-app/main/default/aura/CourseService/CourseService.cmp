@@ -1,14 +1,15 @@
 <aura:component controller="CourseServiceController" implements="forceCommunity:layout,forceCommunity:availableForAllPageTypes" access="global">
+    <ltng:require styles="{!$Resource.pikadayCSS + '/pikaday.css'}"/>
+    <ltng:require scripts="{!$Resource.pikadayJS + '/pikaday.js'}"/>
     <aura:attribute name="courseDateMap" type="Map"/>
     <aura:attribute name="courseNameList" type="List"/>
-    <aura:attribute name="firstDate" type="Date"/>
-    <aura:attribute name="lastDate" type="Date"/>
     <aura:attribute name="isUnassigned" type="Boolean" default="true"/>
     <aura:attribute name="firstName" type="String" access="private"/>
     <aura:attribute name="lastName" type="String" access="private"/>
     <aura:attribute name="email" type="String" access="private"/>
     <aura:attribute name="courseName" type="String" access="private"/>
     <aura:attribute name="courseDate" type="String" access="private"/>
+    <aura:attribute name="isBtnDisabled" type="Boolean" default="true" access="private"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <div class="slds-grid slds-wrap">
         <div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-align_absolute-center">
@@ -44,19 +45,19 @@
                                     onchange="{!c.onChange}"/>
                     </div>
                     <div class="slds-box">
-                        <lightning:input name="inputDate"
-                                    type="date"
-                                    value="{!v.courseDate}"
-                                    required="true"
-                                    disabled="{!v.isUnassigned}"
-                                    min="{!v.firstDate}"
-                                    max="{!v.lastDate}"
-                                    label="Date"/>
+                        <abbr title="required" class="slds-required">*</abbr>
+                        <label class="slds-form-element__label" for="dateId">Date</label>
+                        <input id="dateId"
+                            class="slds-form-element slds-input"
+                            type="text"
+                            disabled="{!v.isUnassigned}"
+                            onchange="{!c.onChangeDate}"/>
                     </div>
                     <div class="slds-align_absolute-center">
                         <lightning:button class="slds-button slds-button_brand slds-m-around_x-small"
                                         name="submit"
                                         label="Submit"
+                                        disabled="{!or(!v.courseDate, v.isUnassigned)}"
                                         iconName="utility:new"
                                         iconPosition="left"
                                         onclick="{!c.onSubmit}"/>

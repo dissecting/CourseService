@@ -40,13 +40,56 @@
         var courseDateMap = component.get("v.courseDateMap");
         var selectedCourseDate = courseDateMap[selectedOptionValue];
 
-        if (selectedCourseDate) {
-            component.set("v.firstDate", selectedCourseDate[0]);
-            component.set("v.lastDate", selectedCourseDate[courseDateMap[selectedOptionValue].length - 1]);
-            component.set("v.isUnassigned", false);
-        } else {
-            component.set("v.isUnassigned", true);
+        selectedCourseDate ? component.set("v.isUnassigned", false) : component.set("v.isUnassigned", true);
+
+        var isDisabledYearList = [];
+        var isDisabledMonthList = [];
+        var isDisabledDateList = [];
+        var toDay = new Date();
+
+        for (var i = 0; i < selectedCourseDate.length; i++) {
+            var isGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) >= toDay.getFullYear()
+                && Number(selectedCourseDate[i].split("-")[1]) >= toDay.getMonth()
+                && Number(selectedCourseDate[i].split("-")[2]) > toDay.getDate()
+            if (isGreaterThenToDay) {
+                isDisabledYearList.push(Number(selectedCourseDate[i].split("-")[0]));
+                isDisabledMonthList.push(Number(selectedCourseDate[i].split("-")[1]));
+                isDisabledDateList.push(Number(selectedCourseDate[i].split("-")[2]));
+            }
         }
+
+        var picker = new Pikaday({
+            field: document.getElementById("dateId"),
+            disableDayFn: function(theDate) {
+                var isDisabled;
+                isDisabled = isDisabledYearList.includes(theDate.getFullYear())
+                    && isDisabledMonthList.includes(theDate.getMonth() + 1)
+                    && isDisabledDateList.includes(theDate.getDate());
+
+                return !isDisabled;
+            }
+        });
+    },
+
+    handleChangeDate: function (component) {
+        var months = {
+            "Jan" : "01",
+            "Feb" : "02",
+            "Mar" : "03",
+            "Apr" : "04",
+            "May" : "05",
+            "Jun" : "06",
+            "Jul" : "07",
+            "Aug" : "08",
+            "Sep" : "09",
+            "Oct" : "10",
+            "Nov" : "11",
+            "Dec" : "12"
+        }
+        var newDate = document.getElementById("dateId").value.split(" ")[3] + "-" +
+            months[document.getElementById("dateId").value.split(" ")[1]] + "-" +
+            document.getElementById("dateId").value.split(" ")[2];
+        component.set("v.courseDate", newDate);
     },
 
     handleSubmit: function (component) {
@@ -72,7 +115,7 @@
             } else if (state === "ERROR") {
                 var errors = response.getError();
                 this.handleShowToast(component, state, errors[0].message);
-                console.error(errors);
+                console.error(JSON.stringify(errors));
             }
         });
         $A.enqueueAction(action);

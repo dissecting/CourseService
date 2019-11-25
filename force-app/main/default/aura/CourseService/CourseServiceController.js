@@ -10,5 +10,9 @@
 
     onSubmit: function (component, event, helper) {
         helper.handleSubmit(component);
+    },
+
+    onChangeDate: function (component, event, helper) {
+        helper.handleChangeDate(component);
     }
 })

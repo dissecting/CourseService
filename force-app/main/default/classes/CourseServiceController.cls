@@ -6,7 +6,7 @@ public without sharing class CourseServiceController {
         CoursesWithDates coursesWithDates = new CoursesWithDates();
 
         List<Course__c> courseList = [
-            SELECT Name, Description__c
+            SELECT Name
             FROM Course__c
         ];
 
@@ -41,7 +41,6 @@ public without sharing class CourseServiceController {
                                             String courseName,
                                             Date courseDate) {
 
-        String msg = 'Error';
         Boolean isBlankField = String.isBlank(firstName)
             || String.isBlank(lastName)
             || String.isBlank(email)
@@ -58,66 +57,86 @@ public without sharing class CourseServiceController {
                 throw new AuraHandledException(Label.errMsgIncorrectEmail);
             }
 
-            List<Contact> contactList = [
-                SELECT Email
-                FROM Contact
-                WHERE Email = :email
-                LIMIT 1
-            ];
+            Set<Id> eventIdSet = new Set<Id>();
 
-            List<Event> eventList = [
-                SELECT Course__r.Name, ActivityDate
-                FROM Event
-                WHERE Course__r.Name = :courseName
-                    AND ActivityDate = :courseDate
-            ];
-
-            Contact newContact = new Contact(
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email
-            );
-
-            if (contactList.isEmpty()) {
-                insert newContact;
-            } else {
-                contactList[0].FirstName = firstName;
-                contactList[0].LastName = lastName;
-                contactList[0].Email = email;
-
-                update contactList;
+            for (Event evt : getEventList(courseName, courseDate)) {
+                eventIdSet.add(evt.Id);
             }
 
-            if (!eventList.isEmpty()) {
-                List<Contact> newContactList = [
-                    SELECT Email
-                    FROM Contact
-                    WHERE Email = :email
-                    LIMIT 1
-                ];
-
-                List<ContactEvent__c> contactEventList = [
-                    SELECT Contact__c
-                    FROM ContactEvent__c
-                    WHERE Contact__c = :newContactList[0].Id
-                ];
-
-                if (contactEventList.isEmpty()) {
-                    ContactEvent__c newContactEvent = new ContactEvent__c(
-                        Contact__c = newContactList[0].Id,
-                        Name = email.right(30) + '-' + courseName.right(30),
-                        EventId__c = eventList[0].Id,
-                        Status__c = 'Waiting List'
-                    );
-
-                    insert newContactEvent;
-                } else {
-                    throw new AuraHandledException('This contact already been registered');
-                }
+            if (getContactList(email).isEmpty()) {
+                insertContact(firstName, lastName, email);
             } else {
-                throw new AuraHandledException(msg);
+                updateContact(getContactList(email), firstName, lastName, email);
+            }
+
+            if (getContactEventList(eventIdSet, email).isEmpty()) {
+                insertContactEvent(getEventList(courseName, courseDate), email, courseName);
+            } else {
+                throw new AuraHandledException('This contact already been registered');
             }
         }
+    }
+
+    private static List<Contact> getContactList(String email) {
+        List<Contact> contactList = [
+            SELECT Email
+            FROM Contact
+            WHERE Email = :email
+            LIMIT 1
+        ];
+
+        return contactList;
+    }
+
+    private static List<Event> getEventList(String courseName, Date courseDate) {
+        List<Event> eventList = [
+            SELECT Course__r.Name, ActivityDate
+            FROM Event
+            WHERE Course__r.Name = :courseName
+                AND ActivityDate = :courseDate
+        ];
+
+        return eventList;
+    }
+
+    private static List<ContactEvent__c> getContactEventList(Set<Id> eventIdSet, String email) {
+        List<ContactEvent__c> contactEventList = [
+            SELECT Contact__c, EventId__c
+            FROM ContactEvent__c
+            WHERE Contact__c = :getContactList(email)[0].Id
+                AND EventId__c IN :eventIdSet
+        ];
+
+        return contactEventList;
+    }
+
+    private static void insertContact(String firstName, String lastName, String email) {
+        Contact newContact = new Contact(
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email
+        );
+
+        insert newContact;
+    }
+
+    private static void updateContact(List<Contact> contactList, String firstName, String lastName, String email) {
+        contactList[0].FirstName = firstName;
+        contactList[0].LastName = lastName;
+        contactList[0].Email = email;
+
+        update contactList;
+    }
+
+    private static void insertContactEvent(List<Event> eventList, String email, String courseName) {
+        ContactEvent__c newContactEvent = new ContactEvent__c(
+            Contact__c = getContactList(email)[0].Id,
+            Name = email.right(30) + '-' + courseName.right(30),
+            EventId__c = eventList[0].Id,
+            Status__c = 'Attended'
+        );
+
+        insert newContactEvent;
     }
 
     public class CoursesWithDates {
