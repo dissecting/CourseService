@@ -1,8 +1,8 @@
 <aura:component controller="CourseServiceController" implements="forceCommunity:layout,forceCommunity:availableForAllPageTypes" access="global">
     <ltng:require styles="{!$Resource.pikadayCSS + '/pikaday.css'}"/>
     <ltng:require scripts="{!$Resource.pikadayJS + '/pikaday.js'}"/>
-    <aura:attribute name="courseDateMap" type="Map"/>
-    <aura:attribute name="courseNameList" type="List"/>
+    <aura:attribute name="courseDateMap" type="Map" access="private"/>
+    <aura:attribute name="courseNameList" type="List" access="private"/>
     <aura:attribute name="isUnassigned" type="Boolean" default="true"/>
     <aura:attribute name="firstName" type="String" access="private"/>
     <aura:attribute name="lastName" type="String" access="private"/>
@@ -51,6 +51,7 @@
                             class="slds-form-element slds-input"
                             type="text"
                             disabled="{!v.isUnassigned}"
+                            onclick="{c.onClickDateInput}"
                             onchange="{!c.onChangeDate}"/>
                     </div>
                     <div class="slds-align_absolute-center">
