@@ -42,29 +42,32 @@
 
         selectedCourseDate ? component.set("v.isUnassigned", false) : component.set("v.isUnassigned", true);
 
-        var isDisabledYearList = [];
-        var isDisabledMonthList = [];
-        var isDisabledDateList = [];
+        var isDisabledDatesList = [];
         var toDay = new Date();
 
         for (var i = 0; i < selectedCourseDate.length; i++) {
             var isGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) >= toDay.getFullYear()
-                && Number(selectedCourseDate[i].split("-")[1]) >= toDay.getMonth()
-                && Number(selectedCourseDate[i].split("-")[2]) > toDay.getDate()
-            if (isGreaterThenToDay) {
-                isDisabledYearList.push(Number(selectedCourseDate[i].split("-")[0]));
-                isDisabledMonthList.push(Number(selectedCourseDate[i].split("-")[1]));
-                isDisabledDateList.push(Number(selectedCourseDate[i].split("-")[2]));
+                && Number(selectedCourseDate[i].split("-")[1]) >= Number(toDay.getMonth() + 1)
+                && Number(selectedCourseDate[i].split("-")[2]) >= toDay.getDate();
+
+            var monthIsMonthGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) >= toDay.getFullYear()
+                && Number(selectedCourseDate[i].split("-")[1]) > Number(toDay.getMonth() + 1);
+
+            var yearIsGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) > toDay.getFullYear();
+
+            if (isGreaterThenToDay || monthIsMonthGreaterThenToDay || yearIsGreaterThenToDay) {
+                isDisabledDatesList.push(selectedCourseDate[i]);
             }
         }
 
+        console.log(isDisabledDatesList);
         var picker = new Pikaday({
             field: document.getElementById("dateId"),
             disableDayFn: function(theDate) {
-                var isDisabled;
-                isDisabled = isDisabledYearList.includes(theDate.getFullYear())
-                    && isDisabledMonthList.includes(theDate.getMonth() + 1)
-                    && isDisabledDateList.includes(theDate.getDate());
+                var dateFormated = theDate.getFullYear()
+                    + "-" + (theDate.getMonth() + 1)
+                    + "-" + (theDate.getDate() < 10 ? "0" + theDate.getDate() : theDate.getDate());
+                var isDisabled = isDisabledDatesList.includes(dateFormated);
 
                 return !isDisabled;
             }
