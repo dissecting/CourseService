@@ -20,29 +20,29 @@
                     </span>
                     <div class="slds-box">
                         <lightning:input name="inputFirstName"
-                                    value="{!v.firstName}"
-                                    required="true"
-                                    label="{!$Label.c.firstNameLabel}"/>
+                                        value="{!v.firstName}"
+                                        required="true"
+                                        label="{!$Label.c.firstNameLabel}"/>
                     </div>
                     <div class="slds-box">
                         <lightning:input name="inputLastName"
-                                    value="{!v.lastName}"
-                                    required="true"
-                                    label="{!$Label.c.lastNameLabel}"/>
+                                        value="{!v.lastName}"
+                                        required="true"
+                                        label="{!$Label.c.lastNameLabel}"/>
                     </div>
                     <div class="slds-box">
                         <lightning:input name="inputEmail"
-                                    value="{!v.email}"
-                                    required="true"
-                                    label="{!$Label.c.emailAddressLabel}"/>
+                                        value="{!v.email}"
+                                        required="true"
+                                        label="{!$Label.c.emailAddressLabel}"/>
                     </div>
                     <div class="slds-box">
                         <lightning:combobox name="inputCourse"
-                                    label="Course"
-                                    value="{!v.courseName}"
-                                    options="{!v.courseNameList}"
-                                    required="true"
-                                    onchange="{!c.onChange}"/>
+                                        label="Course"
+                                        value="{!v.courseName}"
+                                        options="{!v.courseNameList}"
+                                        required="true"
+                                        onchange="{!c.onChange}"/>
                     </div>
                     <div class="slds-box">
                         <abbr title="required" class="slds-required">*</abbr>
