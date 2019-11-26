@@ -9,6 +9,7 @@
     <aura:attribute name="email" type="String" access="private"/>
     <aura:attribute name="courseName" type="String" access="private"/>
     <aura:attribute name="courseDate" type="String" access="private"/>
+    <aura:attribute name="picker" type="Object" access="private"/>
     <aura:attribute name="isBtnDisabled" type="Boolean" default="true" access="private"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <div class="slds-grid slds-wrap">

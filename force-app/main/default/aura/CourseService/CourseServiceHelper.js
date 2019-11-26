@@ -40,6 +40,11 @@
         var courseDateMap = component.get("v.courseDateMap");
         var selectedCourseDate = courseDateMap[selectedOptionValue];
 
+        var picker = component.get("v.picker");
+        if (picker != null) {
+            picker.destroy();
+        }
+
         selectedCourseDate ? component.set("v.isUnassigned", false) : component.set("v.isUnassigned", true);
 
         var enabledDatesList = [];
@@ -60,7 +65,7 @@
             }
         }
 
-        var picker = new Pikaday({
+        picker = new Pikaday({
             field: document.getElementById("dateId"),
             disableDayFn: function(theDate) {
                 var dateFormated = theDate.getFullYear()
@@ -71,6 +76,8 @@
                 return !isEnabled;
             }
         });
+
+        component.set("v.picker", picker);
     },
 
     handleChangeDate: function (component) {
