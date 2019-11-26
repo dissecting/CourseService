@@ -42,7 +42,7 @@
 
         selectedCourseDate ? component.set("v.isUnassigned", false) : component.set("v.isUnassigned", true);
 
-        var isEnabledDatesList = [];
+        var enabledDatesList = [];
         var toDay = new Date();
 
         for (var i = 0; i < selectedCourseDate.length; i++) {
@@ -56,7 +56,7 @@
             var yearIsGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) > toDay.getFullYear();
 
             if (isGreaterThenToDay || monthIsMonthGreaterThenToDay || yearIsGreaterThenToDay) {
-                isEnabledDatesList.push(selectedCourseDate[i]);
+                enabledDatesList.push(selectedCourseDate[i]);
             }
         }
 
@@ -66,7 +66,7 @@
                 var dateFormated = theDate.getFullYear()
                     + "-" + (theDate.getMonth() + 1)
                     + "-" + (theDate.getDate() < 10 ? "0" + theDate.getDate() : theDate.getDate());
-                var isEnabled = isEnabledDatesList.includes(dateFormated);
+                var isEnabled = enabledDatesList.includes(dateFormated);
 
                 return !isEnabled;
             }
