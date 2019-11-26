@@ -10,7 +10,6 @@
     <aura:attribute name="courseName" type="String" access="private"/>
     <aura:attribute name="courseDate" type="String" access="private"/>
     <aura:attribute name="picker" type="Object" access="private"/>
-    <aura:attribute name="isBtnDisabled" type="Boolean" default="true" access="private"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <div class="slds-grid slds-wrap">
         <div class="slds-col slds-small-size_12-of-12 slds-medium-size_6-of-12 slds-large-size_4-of-12 slds-align_absolute-center">
