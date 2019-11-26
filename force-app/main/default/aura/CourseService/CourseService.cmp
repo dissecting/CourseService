@@ -51,7 +51,6 @@
                             class="slds-form-element slds-input"
                             type="text"
                             disabled="{!v.isUnassigned}"
-                            onclick="{c.onClickDateInput}"
                             onchange="{!c.onChangeDate}"/>
                     </div>
                     <div class="slds-align_absolute-center">
