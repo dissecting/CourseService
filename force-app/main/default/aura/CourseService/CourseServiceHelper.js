@@ -42,7 +42,7 @@
 
         selectedCourseDate ? component.set("v.isUnassigned", false) : component.set("v.isUnassigned", true);
 
-        var isDisabledDatesList = [];
+        var isEnabledDatesList = [];
         var toDay = new Date();
 
         for (var i = 0; i < selectedCourseDate.length; i++) {
@@ -56,20 +56,19 @@
             var yearIsGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) > toDay.getFullYear();
 
             if (isGreaterThenToDay || monthIsMonthGreaterThenToDay || yearIsGreaterThenToDay) {
-                isDisabledDatesList.push(selectedCourseDate[i]);
+                isEnabledDatesList.push(selectedCourseDate[i]);
             }
         }
 
-        console.log(isDisabledDatesList);
         var picker = new Pikaday({
             field: document.getElementById("dateId"),
             disableDayFn: function(theDate) {
                 var dateFormated = theDate.getFullYear()
                     + "-" + (theDate.getMonth() + 1)
                     + "-" + (theDate.getDate() < 10 ? "0" + theDate.getDate() : theDate.getDate());
-                var isDisabled = isDisabledDatesList.includes(dateFormated);
+                var isEnabled = isEnabledDatesList.includes(dateFormated);
 
-                return !isDisabled;
+                return !isEnabled;
             }
         });
     },
