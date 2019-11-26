@@ -72,7 +72,7 @@ public without sharing class CourseServiceController {
             if (getContactEventList(eventIdSet, email).isEmpty()) {
                 insertContactEvent(getEventList(courseName, courseDate), email, courseName);
             } else {
-                throw new AuraHandledException('This contact already been registered');
+                throw new AuraHandledException(Label.msgContactAlreadyRegistered);
             }
         }
     }
