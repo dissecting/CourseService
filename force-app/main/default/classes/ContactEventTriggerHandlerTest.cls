@@ -1,7 +1,7 @@
 @isTest
 private class ContactEventTriggerHandlerTest {
     @testSetup
-    static void prepareData() {
+    private static void prepareData() {
         Course__c course = new Course__c (
             Name = 'TestCourse'
         );
@@ -40,7 +40,7 @@ private class ContactEventTriggerHandlerTest {
     }
 
     @isTest
-    static void testInsertContactEvent() {
+    private static void testInsertContactEvent() {
 
         List<Event> eventList = [
             SELECT Subject, Course__r.Name, Max_Person__c
@@ -104,7 +104,7 @@ private class ContactEventTriggerHandlerTest {
     }
 
     @isTest
-    static void testDeleteContactEvent() {
+    private static void testDeleteContactEvent() {
 
         List<Event> eventList = [
             SELECT Subject, Course__r.Name, Max_Person__c
