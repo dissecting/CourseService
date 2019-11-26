@@ -51,7 +51,7 @@ public without sharing class CourseServiceController {
             throw new AuraHandledException(Label.errMsgFieldsMustBeFilled);
         } else {
 
-            Boolean isCorrectEmail = (Pattern.matches(Label.emailPattern, email));
+            Boolean isCorrectEmail = Pattern.matches(Label.emailPattern, email);
 
             if (!isCorrectEmail) {
                 throw new AuraHandledException(Label.errMsgIncorrectEmail);
