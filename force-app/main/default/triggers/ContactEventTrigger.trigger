@@ -1,6 +1,4 @@
-trigger ContactEventTrigger on ContactEvent__c (after insert, after delete) {
+trigger ContactEventTrigger on ContactEvent__c (after delete, after undelete, after insert, after update, before delete, before insert, before update) {
 
-    if (Trigger.isAfter && (Trigger.isInsert || Trigger.isDelete)) {
-        ContactEventTriggerHandler.changeCourseStatus(Trigger.new);
-    }
+    TriggerFactory.createHandler(ContactEvent__c.sObjectType);
 }
