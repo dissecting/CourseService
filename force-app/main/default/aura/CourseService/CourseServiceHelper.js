@@ -1,7 +1,5 @@
 ({
     handleInit : function(component) {
-        component.set("v.firstDate", null);
-        component.set("v.lastDate", null);
         var action = component.get("c.getCoursesWithDates");
         action.setCallback(this, function(response) {
             var state = response.getState();

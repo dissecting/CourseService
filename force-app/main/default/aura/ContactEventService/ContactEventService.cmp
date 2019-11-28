@@ -1,0 +1,51 @@
+<aura:component controller="ContactEventServiceController" implements="force:lightningQuickAction, force:hasRecordId, force:appHostable, flexipage:availableForRecordHome, force:hasSObjectName" access="global">
+    <aura:attribute name="contactEventList" type="List" access="private"/>
+    <aura:attribute name="contactEventMap" type="Map" access="private"/>
+    <aura:attribute name="statusList"
+                    type="List"
+                    access="private"
+                    default="[{'label': 'Attended', 'value': 'Attended'}, {'label': 'Waiting List', 'value': 'Waiting List'}]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+        <article class="slds-card">
+            <div class="slds-m-around--large">
+                <span class="slds-text-title slds-align_absolute-center">
+                    Contact Event Service
+                </span>
+            </div>
+            <aura:iteration items="{!v.contactEventList}" var="contactEvent" indexVar="index">
+                <div>
+                    <lightning:input aura:id="contEvtNameId"
+                                    readonly="true"
+                                    name="inputcontEvtName"
+                                    value="{!contactEvent.Name}"
+                                    required="true"
+                                    label="Contact Event Name"/>
+                </div>
+                <div>
+                    <lightning:combobox name="statusFieled"
+                                    tabindex="{!index}"
+                                    label="Status"
+                                    value="{!contactEvent.Status__c}"
+                                    options="{!v.statusList}"
+                                    required="true"
+                                    onchange="{!c.onChange}"/>
+                </div>
+                <div id="updateBtnId">
+                    <lightning:button label="Update"
+                                    tabindex="{!index}"
+                                    iconName="utility:close"
+                                    iconPosition="left"
+                                    variant="destructive"
+                                    onclick="{!c.onUpdate}"/>
+                </div>
+                <div id="deleteBtnId">
+                    <lightning:button label="Delete"
+                                    tabindex="{!index}"
+                                    iconName="utility:close"
+                                    iconPosition="left"
+                                    variant="destructive"
+                                    onclick="{!c.onDelete}"/>
+                </div>
+            </aura:iteration>
+        </article>
+</aura:component>
