@@ -17,9 +17,11 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
         }
 
         List<Event> eventList = getEventList(contactEventIdSet);
-        List<ContactEvent__c> contactEventAttendedList = contactEventAttendedList(getEventIdSet(eventList));
+        List<ContactEvent__c> contactEventAttendedList = ContactEventTriggerHandler.contactEventAttendedList(
+            ContactEventTriggerHandler.getEventIdSet(eventList)
+        );
 
-        eventMap = getEventMap(contactEventAttendedList);
+        eventMap = ContactEventTriggerHandler.getEventMap(contactEventAttendedList);
 
         if (!eventList.isEmpty()) {
             for (Event evt : eventList) {
@@ -53,17 +55,18 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
                 }
             }
 
-            contactEventChangeStatusToAttended(attendedContactEventList);
-            contactEventChangeStatusToWaiting(waitingContactEventList);
+            ContactEventTriggerHandler.contactEventChangeStatusToAttended(attendedContactEventList);
+            ContactEventTriggerHandler.contactEventChangeStatusToWaiting(waitingContactEventList);
         }
     }
 
     public void beforeUpdate(List<SObject> newlstObj, List<SObject> oldlstObj, Map<Id, SObject> newMapObj, Map<Id, SObject> oldMapObj) {
 
-        List<ContactEvent__c> newContactEventLst = newlstObj;
+       /* List<ContactEvent__c> newContactEventLst = newlstObj;
         List<ContactEvent__c> oldContactEventLst = oldlstObj;
         Map<String, List<ContactEvent__c>> eventMap = new Map<String, List<ContactEvent__c>>();
         List<ContactEvent__c> attendedContactEventList = new List<ContactEvent__c>();
+        List<ContactEvent__c> newAttendedContactEventList = new List<ContactEvent__c>();
         List<ContactEvent__c> waitingContactEventList = new List<ContactEvent__c>();
         Set<Id> contactEventIdSet = new Set<Id>();
         Boolean isStatusChanged = false;
@@ -79,11 +82,15 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
         }
 
         if (isStatusChanged) {
-            List<Event> eventList = getEventList(contactEventIdSet);
-            List<ContactEvent__c> contactEventAttendedList = contactEventAttendedList(getEventIdSet(eventList));
-            List<ContactEvent__c> contactEventWaitingList = contactEventWaitingList(getEventIdSet(eventList));
+            List<Event> eventList = ContactEventTriggerHandler.getEventList(contactEventIdSet);
+            List<ContactEvent__c> contactEventAttendedList = ContactEventTriggerHandler.contactEventAttendedList(
+                ContactEventTriggerHandler.getEventIdSet(eventList)
+            );
+            List<ContactEvent__c> contactEventWaitingList = ContactEventTriggerHandler.contactEventWaitingList(
+                ContactEventTriggerHandler.getEventIdSet(eventList)
+            );
 
-            eventMap = getEventMap(contactEventAttendedList);
+            eventMap = ContactEventTriggerHandler.getEventMap(contactEventAttendedList);
 
             if (!eventList.isEmpty()) {
                 for (Event evt : eventList) {
@@ -97,6 +104,11 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
                             if (newContactEventLst.size() > index) {
                                 if (newContactEventLst[index].Status__c == 'Waiting List') {
                                     waitingContactEventList.add(newContactEventLst[index]);
+
+                                    if (contactEventWaitingList.size() > index) {
+                                        newAttendedContactEventList.add(contactEventWaitingList[index]);
+                                    }
+
                                 } else {
                                     throw new TriggerException('Max member size!');
                                 }
@@ -134,10 +146,15 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
                     }
                 }
 
-                contactEventChangeStatusToAttended(attendedContactEventList);
-                contactEventChangeStatusToWaiting(waitingContactEventList);
+                ContactEventTriggerHandler.contactEventChangeStatusToAttended(attendedContactEventList);
+                ContactEventTriggerHandler.contactEventChangeStatusToWaiting(waitingContactEventList);
+                ContactEventTriggerHandler.contactEventChangeStatusToAttended(newAttendedContactEventList);
+
+                if (!newAttendedContactEventList.isEmpty()) {
+                    update newAttendedContactEventList;
+                }
             }
-        }
+        }*/
 
     }
 
@@ -145,7 +162,95 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
     public void afterInsert(List<SObject> newlstObj, Map<Id, SObject> newMapObj) {}
 
-    public void afterUpdate(List<SObject> newlstObj, List<SObject> oldlstObj, Map<Id, SObject> newMapObj, Map<Id, SObject> oldMapObj) {}
+    public void afterUpdate(List<SObject> newlstObj, List<SObject> oldlstObj, Map<Id, SObject> newMapObj, Map<Id, SObject> oldMapObj) {
+        List<ContactEvent__c> newContactEventLst = newlstObj;
+        List<ContactEvent__c> oldContactEventLst = oldlstObj;
+        Map<String, List<ContactEvent__c>> eventMap = new Map<String, List<ContactEvent__c>>();
+        List<ContactEvent__c> attendedContactEventList = new List<ContactEvent__c>();
+        List<ContactEvent__c> newAttendedContactEventList = new List<ContactEvent__c>();
+        List<ContactEvent__c> waitingContactEventList = new List<ContactEvent__c>();
+        Set<Id> contactEventIdSet = new Set<Id>();
+        Boolean isStatusChanged = false;
+        Integer contactEventIndex = 0;
+
+        for (ContactEvent__c contEvt : newContactEventLst) {
+
+            if (contEvt.Status__c != oldContactEventLst[contactEventIndex].Status__c) {
+                isStatusChanged = true;
+            }
+            contactEventIndex++;
+            contactEventIdSet.add(contEvt.EventId__c);
+        }
+
+        if (isStatusChanged) {
+            List<Event> eventList = ContactEventTriggerHandler.getEventList(contactEventIdSet);
+            List<ContactEvent__c> contactEventAttendedList = ContactEventTriggerHandler.contactEventAttendedList(
+                ContactEventTriggerHandler.getEventIdSet(eventList)
+            );
+            List<ContactEvent__c> contactEventWaitingList = ContactEventTriggerHandler.contactEventWaitingList(
+                ContactEventTriggerHandler.getEventIdSet(eventList)
+            );
+
+            eventMap = ContactEventTriggerHandler.getEventMap(contactEventAttendedList);
+
+            if (!eventList.isEmpty()) {
+                for (Event evt : eventList) {
+
+                    if (!eventMap.isEmpty()) {
+                        Integer index = 0;
+                        Integer mapSize = eventMap.get(evt.Id).size();
+
+                        while (evt.Max_Person__c > mapSize) {
+
+                            if (newContactEventLst.size() > index) {
+                                if (newContactEventLst[index].Status__c == 'Waiting List') {
+                                    if (contactEventWaitingList.size() > index && newContactEventLst[index].Id != contactEventWaitingList[index].Id) {
+                                        newAttendedContactEventList.add(contactEventWaitingList[index]);
+                                    }
+
+                                }
+                            }
+
+                            index++;
+                            mapSize++;
+                        }
+
+                        while (evt.Max_Person__c < mapSize) {
+
+                            if (newContactEventLst.size() > index) {
+                                if (newContactEventLst[index].Status__c == 'Attended') {
+                                    throw new TriggerException('Max member size!');
+                                }
+                            }
+
+                            index++;
+                            mapSize--;
+                        }
+
+                    } else {
+
+                        for (Integer i = 0; i < evt.Max_Person__c; i++) {
+                            if (newContactEventLst.size() > i) {
+                                attendedContactEventList.add(newContactEventLst[i]);
+                            }
+                        }
+
+                        if (newContactEventLst.size() > Integer.valueOf(evt.Max_Person__c)) {
+                            for (Integer i = Integer.valueOf(evt.Max_Person__c); i < newContactEventLst.size(); i++) {
+                                waitingContactEventList.add(newContactEventLst[i]);
+                            }
+                        }
+                    }
+                }
+
+                ContactEventTriggerHandler.contactEventChangeStatusToAttended(newAttendedContactEventList);
+
+                if (!newAttendedContactEventList.isEmpty()) {
+                    update newAttendedContactEventList;
+                }
+            }
+        }
+    }
 
     public void afterDelete(List<SObject> oldlstObj, Map<Id, SObject> oldMapObj) {
 
@@ -170,8 +275,10 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
         if (!contactEventIdSet.isEmpty()) {
 
-            List<Event> eventList = getEventList(contactEventIdSet);
-            List<ContactEvent__c> contactEventWaitingList = contactEventWaitingList(getEventIdSet(eventList));
+            List<Event> eventList = ContactEventTriggerHandler.getEventList(contactEventIdSet);
+            List<ContactEvent__c> contactEventWaitingList = ContactEventTriggerHandler.contactEventWaitingList(
+                ContactEventTriggerHandler.getEventIdSet(eventList)
+            );
 
             if (!eventList.isEmpty() && !contactEventWaitingList.isEmpty()) {
                 for (Event evt : eventList) {
@@ -191,7 +298,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
                     }
                 }
 
-                contactEventChangeStatusToAttended(attendedContactEventList);
+                ContactEventTriggerHandler.contactEventChangeStatusToAttended(attendedContactEventList);
 
                 if (!attendedContactEventList.isEmpty()) {
                     update attendedContactEventList;
