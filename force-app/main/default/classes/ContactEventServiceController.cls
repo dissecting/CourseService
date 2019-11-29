@@ -94,7 +94,7 @@ public with sharing class ContactEventServiceController {
         try {
             update contactEventList;
         } catch (DMLException e){
-            throw new AuraHandledException('Max member size!');
+            throw new AuraHandledException('Max member count!');
         }
     }
 
