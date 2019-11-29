@@ -16,7 +16,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
             contactEventIdSet.add(contEvt.EventId__c);
         }
 
-        List<Event> eventList = getEventList(contactEventIdSet);
+        List<Event> eventList = ContactEventTriggerHandler.getEventList(contactEventIdSet);
         List<ContactEvent__c> contactEventAttendedList = ContactEventTriggerHandler.contactEventAttendedList(
             ContactEventTriggerHandler.getEventIdSet(eventList)
         );
