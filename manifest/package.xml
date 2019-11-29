@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
+		<members>ContactEventServiceController</members>
+		<members>ContactEventServiceControllerTest</members>
 		<members>ContactEventTriggerHandler</members>
 		<members>ContactEventTriggerHandlerTest</members>
 		<members>CourseServiceController</members>
 		<members>CourseServiceControllerTest</members>
+		<members>ITrigger</members>
+		<members>TriggerException</members>
+		<members>TriggerFactory</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
@@ -12,7 +17,9 @@
 		<name>ApexTrigger</name>
 	</types>
 	<types>
+		<members>ContactEventService</members>
 		<members>CourseService</members>
+		<members>CreateContactEvent</members>
 		<members>defaultTokens</members>
 		<name>AuraDefinitionBundle</name>
 	</types>

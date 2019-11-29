@@ -105,6 +105,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
             eventMap = ContactEventTriggerHandler.getEventMap(contactEventAttendedList);
 
             if (!eventList.isEmpty()) {
+
                 for (Event evt : eventList) {
 
                     if (!eventMap.isEmpty()) {
@@ -113,12 +114,21 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
                         while (evt.Max_Person__c > mapSize) {
 
-                            if (newContactEventLst.size() > index) {
-                                if (newContactEventLst[index].Status__c == 'Waiting List') {
-                                    if (contactEventWaitingList.size() > index && newContactEventLst[index].Id != contactEventWaitingList[index].Id) {
-                                        newAttendedContactEventList.add(contactEventWaitingList[index]);
-                                    }
+                            Integer innerIndex = 0;
 
+                            if (newContactEventLst.size() > index) {
+
+                                if (newContactEventLst[index].Status__c == 'Waiting List') {
+
+                                    while (contactEventWaitingList.size() > innerIndex) {
+
+                                        if (newContactEventLst[index].Id != contactEventWaitingList[innerIndex].Id && newAttendedContactEventList.isEmpty()) {
+
+                                            newAttendedContactEventList.add(contactEventWaitingList[innerIndex]);
+                                        }
+
+                                        innerIndex++;
+                                    }
                                 }
                             }
 
@@ -126,31 +136,13 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
                             mapSize++;
                         }
 
-                        while (evt.Max_Person__c < mapSize) {
+                        if (evt.Max_Person__c < mapSize) {
 
-                            if (newContactEventLst.size() > index) {
-                                if (newContactEventLst[index].Status__c == 'Attended') {
-                                    throw new TriggerException('Max member size!');
-                                }
-                            }
-
-                            index++;
-                            mapSize--;
-                        }
-
-                    } else {
-
-                        for (Integer i = 0; i < evt.Max_Person__c; i++) {
-                            if (newContactEventLst.size() > i) {
-                                attendedContactEventList.add(newContactEventLst[i]);
+                            if (newContactEventLst[0].Status__c == 'Attended') {
+                                throw new TriggerException('Max member size!');
                             }
                         }
 
-                        if (newContactEventLst.size() > Integer.valueOf(evt.Max_Person__c)) {
-                            for (Integer i = Integer.valueOf(evt.Max_Person__c); i < newContactEventLst.size(); i++) {
-                                waitingContactEventList.add(newContactEventLst[i]);
-                            }
-                        }
                     }
                 }
 

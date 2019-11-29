@@ -1,4 +1,4 @@
-public without sharing class ContactEventServiceController {
+public with sharing class ContactEventServiceController {
 
     @AuraEnabled
     public static ContactEventsWithIndexes getContactEvents(Id eventId) {
@@ -40,7 +40,9 @@ public without sharing class ContactEventServiceController {
         } else {
 
             Boolean isCorrectEmail = Pattern.matches(Label.emailPattern, email);
+            Boolean isEmptyContactEventList = ContactEventServiceController.getContactEventList(eventId, email).isEmpty();
             List<Contact> contactList = ContactEventServiceController.getContactList(email);
+            List<Contact> newContactList = new List<Contact>();
 
             if (!isCorrectEmail) {
                 throw new AuraHandledException(Label.errMsgIncorrectEmail);
@@ -52,12 +54,13 @@ public without sharing class ContactEventServiceController {
                 ContactEventServiceController.updateContact(contactList, firstName, lastName, email);
             }
 
-            if (ContactEventServiceController.getContactEventList(eventId, email).isEmpty()) {
+            if (isEmptyContactEventList) {
+                newContactList = ContactEventServiceController.getContactList(email);
                 ContactEventServiceController.insertContactEvent(
                     eventId,
                     email,
                     ContactEventServiceController.getCourseName(eventId),
-                    contactList[0].Id
+                    newContactList[0].Id
                 );
             } else {
                 throw new AuraHandledException(Label.msgContactAlreadyRegistered);
@@ -75,6 +78,24 @@ public without sharing class ContactEventServiceController {
         ];
 
         delete contactEventList;
+    }
+
+    @AuraEnabled
+    public static void updateContactEvent(Id updatedId, String newStatus) {
+
+        List<ContactEvent__c> contactEventList = [
+            SELECT Status__c
+            FROM ContactEvent__c
+            WHERE Id = :updatedId
+        ];
+
+        contactEventList[0].Status__c = newStatus;
+
+        try {
+            update contactEventList;
+        } catch (DMLException e){
+            throw new AuraHandledException('Max member size!');
+        }
     }
 
     private static List<Contact> getContactList(String email) {
@@ -133,7 +154,7 @@ public without sharing class ContactEventServiceController {
         List<ContactEvent__c> contactEventList = [
             SELECT Contact__c, EventId__c
             FROM ContactEvent__c
-            WHERE Contact__c = :email
+            WHERE Contact__r.Email = :email
                 AND EventId__c = :eventId
             LIMIT 1
         ];

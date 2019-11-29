@@ -5,7 +5,8 @@
 
     onChange: function (component, event, helper) {
         var selectedOptionValue = event.getParam("value");
-        helper.handleChange(component, selectedOptionValue);
+        var changeIndex = event.getSource().get("v.tabindex");
+        helper.handleChange(component, selectedOptionValue, changeIndex);
     },
 
     onUpdate: function (component, event, helper) {

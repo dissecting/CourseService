@@ -52,6 +52,8 @@ public without sharing class CourseServiceController {
         } else {
 
             Boolean isCorrectEmail = Pattern.matches(Label.emailPattern, email);
+            List<Contact> contactList = CourseServiceController.getContactList(email);
+            List<Event> eventList = CourseServiceController.getEventList(courseName, courseDate);
 
             if (!isCorrectEmail) {
                 throw new AuraHandledException(Label.errMsgIncorrectEmail);
@@ -59,18 +61,18 @@ public without sharing class CourseServiceController {
 
             Set<Id> eventIdSet = new Set<Id>();
 
-            for (Event evt : getEventList(courseName, courseDate)) {
+            for (Event evt : eventList) {
                 eventIdSet.add(evt.Id);
             }
 
-            if (getContactList(email).isEmpty()) {
-                insertContact(firstName, lastName, email);
+            if (contactList.isEmpty()) {
+                CourseServiceController.insertContact(firstName, lastName, email);
             } else {
-                updateContact(getContactList(email), firstName, lastName, email);
+                CourseServiceController.updateContact(contactList, firstName, lastName, email);
             }
 
-            if (getContactEventList(eventIdSet, email).isEmpty()) {
-                insertContactEvent(getEventList(courseName, courseDate), email, courseName);
+            if (CourseServiceController.getContactEventList(CourseServiceController.getContactList(email)[0].Id, eventIdSet, email).isEmpty()) {
+                CourseServiceController.insertContactEvent(CourseServiceController.getContactList(email)[0].Id, eventList, email, courseName);
             } else {
                 throw new AuraHandledException(Label.msgContactAlreadyRegistered);
             }
@@ -99,11 +101,11 @@ public without sharing class CourseServiceController {
         return eventList;
     }
 
-    private static List<ContactEvent__c> getContactEventList(Set<Id> eventIdSet, String email) {
+    private static List<ContactEvent__c> getContactEventList(Id contactId, Set<Id> eventIdSet, String email) {
         List<ContactEvent__c> contactEventList = [
             SELECT Contact__c, EventId__c
             FROM ContactEvent__c
-            WHERE Contact__c = :getContactList(email)[0].Id
+            WHERE Contact__c = :contactId
                 AND EventId__c IN :eventIdSet
         ];
 
@@ -128,9 +130,9 @@ public without sharing class CourseServiceController {
         update contactList;
     }
 
-    private static void insertContactEvent(List<Event> eventList, String email, String courseName) {
+    private static void insertContactEvent(Id contactId, List<Event> eventList, String email, String courseName) {
         ContactEvent__c newContactEvent = new ContactEvent__c(
-            Contact__c = getContactList(email)[0].Id,
+            Contact__c = contactId,
             Name = email.right(30) + '-' + courseName.right(30),
             EventId__c = eventList[0].Id,
             Status__c = 'Attended'

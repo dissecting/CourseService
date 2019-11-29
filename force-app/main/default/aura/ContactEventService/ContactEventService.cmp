@@ -8,44 +8,47 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
         <article class="slds-card">
             <div class="slds-m-around--large">
-                <span class="slds-text-title slds-align_absolute-center">
+                <span class="slds-text-heading_medium slds-align_absolute-center">
                     Contact Event Service
                 </span>
             </div>
-            <aura:iteration items="{!v.contactEventList}" var="contactEvent" indexVar="index">
-                <div>
-                    <lightning:input aura:id="contEvtNameId"
-                                    readonly="true"
+            <table  class="slds-table slds-table--bordered slds-table--striped">
+                <thead>
+                   <tr>
+                       <th scope="col"><span class="slds-text-heading--medium">Contact Event Name</span></th>
+                       <th scope="col"><span class="slds-text-heading--medium">Status</span></th>
+                   </tr>
+               </thead>
+               <tbody>
+                    <aura:iteration items="{!v.contactEventList}" var="contactEvent" indexVar="index">
+                        <tr>
+                            <td>
+                                <lightning:input readonly="true"
                                     name="inputcontEvtName"
-                                    value="{!contactEvent.Name}"
-                                    required="true"
-                                    label="Contact Event Name"/>
-                </div>
-                <div>
-                    <lightning:combobox name="statusFieled"
+                                    value="{!contactEvent.Name}"/>
+                            </td>
+                            <td>
+                                <lightning:combobox name="statusFieled"
                                     tabindex="{!index}"
-                                    label="Status"
                                     value="{!contactEvent.Status__c}"
                                     options="{!v.statusList}"
-                                    required="true"
                                     onchange="{!c.onChange}"/>
-                </div>
-                <div id="updateBtnId">
-                    <lightning:button label="Update"
-                                    tabindex="{!index}"
-                                    iconName="utility:close"
-                                    iconPosition="left"
-                                    variant="destructive"
+                            </td>
+                            <td>
+                                <lightning:buttonIcon tabindex="{!index}"
+                                    iconName="utility:check"
+                                    variant="brand"
                                     onclick="{!c.onUpdate}"/>
-                </div>
-                <div id="deleteBtnId">
-                    <lightning:button label="Delete"
-                                    tabindex="{!index}"
+                            </td>
+                            <td>
+                                <lightning:buttonIcon tabindex="{!index}"
                                     iconName="utility:close"
-                                    iconPosition="left"
-                                    variant="destructive"
+                                    variant="border-filled"
                                     onclick="{!c.onDelete}"/>
-                </div>
-            </aura:iteration>
+                            </td>
+                        </tr>
+                   </aura:iteration>
+               </tbody>
+           </table>
         </article>
 </aura:component>
