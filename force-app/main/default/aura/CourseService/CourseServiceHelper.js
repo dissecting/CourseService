@@ -53,12 +53,12 @@
                 && Number(selectedCourseDate[i].split("-")[1]) >= Number(toDay.getMonth() + 1)
                 && Number(selectedCourseDate[i].split("-")[2]) >= toDay.getDate();
 
-            var monthIsMonthGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) >= toDay.getFullYear()
+            var monthIsGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) >= toDay.getFullYear()
                 && Number(selectedCourseDate[i].split("-")[1]) > Number(toDay.getMonth() + 1);
 
             var yearIsGreaterThenToDay = Number(selectedCourseDate[i].split("-")[0]) > toDay.getFullYear();
 
-            if (isGreaterThenToDay || monthIsMonthGreaterThenToDay || yearIsGreaterThenToDay) {
+            if (isGreaterThenToDay || monthIsGreaterThenToDay || yearIsGreaterThenToDay) {
                 enabledDatesList.push(selectedCourseDate[i]);
             }
         }
