@@ -82,20 +82,18 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
         List<ContactEvent__c> newAttendedContactEventList = new List<ContactEvent__c>();
         List<ContactEvent__c> waitingContactEventList = new List<ContactEvent__c>();
         Set<Id> contactEventIdSet = new Set<Id>();
-        Boolean isStatusChanged = false;
         Integer contactEventIndex = 0;
 
         for (ContactEvent__c contEvt : newContactEventLst) {
 
             if (contEvt.Status__c != oldContactEventLst[contactEventIndex].Status__c) {
-                isStatusChanged = true;
                 updatedContactEventLst.add(contEvt);
             }
             contactEventIndex++;
             contactEventIdSet.add(contEvt.EventId__c);
         }
 
-        if (isStatusChanged) {
+        if (!updatedContactEventLst.isEmpty()) {
             List<Event> eventList = ContactEventTriggerHandler.getEventList(contactEventIdSet);
             Set<Id> eventIdSet = ContactEventTriggerHandler.getEventIdSet(eventList);
             List<ContactEvent__c> contactEventAttendedList = ContactEventTriggerHandler.contactEventAttendedList(
