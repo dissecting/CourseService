@@ -10,7 +10,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
         List<ContactEvent__c> attendedContactEventList = new List<ContactEvent__c>();
         List<ContactEvent__c> waitingContactEventList = new List<ContactEvent__c>();
         Set<Id> contactEventIdSet = new Set<Id>();
-        List<ContactEvent__c> newContactEventLst = newlstObj;
+        List<ContactEvent__c> newContactEventLst = (List<ContactEvent__c>) newlstObj;
 
         for (ContactEvent__c contEvt : newContactEventLst) {
             contactEventIdSet.add(contEvt.EventId__c);
@@ -74,8 +74,9 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
     public void afterInsert(List<SObject> newlstObj, Map<Id, SObject> newMapObj) {}
 
     public void afterUpdate(List<SObject> newlstObj, List<SObject> oldlstObj, Map<Id, SObject> newMapObj, Map<Id, SObject> oldMapObj) {
-        List<ContactEvent__c> newContactEventLst = newlstObj;
-        List<ContactEvent__c> oldContactEventLst = oldlstObj;
+        List<ContactEvent__c> newContactEventLst = (List<ContactEvent__c>) newlstObj;
+        List<ContactEvent__c> oldContactEventLst = (List<ContactEvent__c>) oldlstObj;
+        List<ContactEvent__c> updatedContactEventLst = new List<ContactEvent__c>();
         Map<String, List<ContactEvent__c>> eventMap = new Map<String, List<ContactEvent__c>>();
         List<ContactEvent__c> attendedContactEventList = new List<ContactEvent__c>();
         List<ContactEvent__c> newAttendedContactEventList = new List<ContactEvent__c>();
@@ -88,6 +89,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
             if (contEvt.Status__c != oldContactEventLst[contactEventIndex].Status__c) {
                 isStatusChanged = true;
+                updatedContactEventLst.add(contEvt);
             }
             contactEventIndex++;
             contactEventIdSet.add(contEvt.EventId__c);
@@ -95,11 +97,12 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
         if (isStatusChanged) {
             List<Event> eventList = ContactEventTriggerHandler.getEventList(contactEventIdSet);
+            Set<Id> eventIdSet = ContactEventTriggerHandler.getEventIdSet(eventList);
             List<ContactEvent__c> contactEventAttendedList = ContactEventTriggerHandler.contactEventAttendedList(
-                ContactEventTriggerHandler.getEventIdSet(eventList)
+                eventIdSet
             );
             List<ContactEvent__c> contactEventWaitingList = ContactEventTriggerHandler.contactEventWaitingList(
-                ContactEventTriggerHandler.getEventIdSet(eventList)
+                eventIdSet
             );
 
             eventMap = ContactEventTriggerHandler.getEventMap(contactEventAttendedList);
@@ -116,13 +119,13 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
                             Integer innerIndex = 0;
 
-                            if (newContactEventLst.size() > index) {
+                            if (updatedContactEventLst.size() > index) {
 
-                                if (newContactEventLst[index].Status__c == 'Waiting List') {
+                                if (updatedContactEventLst[index].Status__c == 'Waiting List') {
 
                                     while (contactEventWaitingList.size() > innerIndex) {
 
-                                        if (newContactEventLst[index].Id != contactEventWaitingList[innerIndex].Id && newAttendedContactEventList.isEmpty()) {
+                                        if (updatedContactEventLst[index].Id != contactEventWaitingList[innerIndex].Id && newAttendedContactEventList.isEmpty()) {
 
                                             newAttendedContactEventList.add(contactEventWaitingList[innerIndex]);
                                         }
@@ -138,7 +141,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
                         if (evt.Max_Person__c < mapSize) {
 
-                            if (newContactEventLst[0].Status__c == 'Attended') {
+                            if (updatedContactEventLst[0].Status__c == 'Attended') {
                                 throw new TriggerException('Max member size!');
                             }
                         }
@@ -157,7 +160,7 @@ public without sharing class ContactEventTriggerHandler implements ITrigger {
 
     public void afterDelete(List<SObject> oldlstObj, Map<Id, SObject> oldMapObj) {
 
-        List<ContactEvent__c> oldContactEventLst = oldlstObj;
+        List<ContactEvent__c> oldContactEventLst = (List<ContactEvent__c>) oldlstObj;
         List<ContactEvent__c> attendedContactEventList = new List<ContactEvent__c>();
         Set<Id> contactEventIdSet = new Set<Id>();
         Map<String, List<ContactEvent__c>> eventMap = new Map<String, List<ContactEvent__c>>();
